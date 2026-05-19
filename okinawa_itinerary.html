@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兩家人的沖繩旅遊 6天手札</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (for cute icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', 'Kosugi Maru', sans-serif;
+            background-color: #FFFDF4;
+            background-image: radial-gradient(#F7E6C4 1.2px, #FFFDF4 1.2px);
+            background-size: 24px 24px;
+        }
+
+        .japanese-border {
+            border: 3px solid #4A3E3D;
+            box-shadow: 4px 4px 0px #4A3E3D;
+        }
+
+        .soft-shadow {
+            box-shadow: 0 4px 14px rgba(74, 62, 61, 0.08);
+        }
+
+        .tab-active {
+            background-color: #FF7B89;
+            color: white;
+            border-color: #4A3E3D;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 0px #4A3E3D;
+        }
+
+        .tab-inactive {
+            background-color: #FFF;
+            color: #4A3E3D;
+            border-color: #4A3E3D;
+            box-shadow: 0 3px 0px #4A3E3D;
+        }
+
+        .tab-inactive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 0px #4A3E3D;
+        }
+
+        /* Leaflet custom styling to fit cute theme */
+        .leaflet-container {
+            border: 3px solid #4A3E3D;
+            border-radius: 1.5rem;
+            box-shadow: 4px 4px 0px #4A3E3D;
+        }
+
+        .cute-badge {
+            background-color: #FFD23F;
+            border: 2px solid #4A3E3D;
+            box-shadow: 2px 2px 0px #4A3E3D;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFDF4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #F7E6C4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFBD59;
+        }
+    </style>
+</head>
+<body class="text-[#4A3E3D] pb-12 antialiased">
+
+    <!-- Header & Title Banner -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-[#A2D2FF] to-[#E8F0FE] border-b-4 border-[#4A3E3D] px-4 py-8 md:py-12">
+        <!-- Deco elements -->
+        <div class="absolute top-4 left-4 text-4xl md:text-5xl opacity-40 animate-bounce"><i class="fa-solid fa-cloud text-white"></i></div>
+        <div class="absolute top-8 right-10 text-3xl md:text-4xl opacity-30"><i class="fa-solid fa-plane text-[#FF7B89] -rotate-12"></i></div>
+        <div class="absolute bottom-2 left-10 text-5xl md:text-6xl opacity-20 text-[#FFBD59]"><i class="fa-solid fa-umbrella-beach"></i></div>
+        <div class="absolute bottom-4 right-6 text-5xl opacity-30 text-[#FF7B89]"><i class="fa-solid fa-flower">🌺</i></div>
+
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <!-- Travel Tag -->
+            <div class="inline-flex items-center gap-2 bg-[#FF7B89] text-white px-4 py-1.5 rounded-full font-black text-sm md:text-base border-2 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D] mb-4">
+                <i class="fa-solid fa-compass"></i> 沖繩自駕趣
+            </div>
+            
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-black tracking-wider mb-3 drop-shadow-[2px_2px_0px_rgba(255,255,255,0.8)]">
+                兩家人的沖繩旅遊
+            </h1>
+            <p class="text-base md:text-lg font-bold text-[#557A95] mb-4">
+                📅 2026/6/26 - 7/1 ． 美好旅程的開始，一起探索沖繩的陽光與海島風情！
+            </p>
+
+            <!-- Member Info Banner -->
+            <div class="inline-flex flex-wrap justify-center gap-4 bg-white/90 px-6 py-3 rounded-2xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D]">
+                <div class="flex items-center gap-2 font-black text-sm md:text-base">
+                    <span class="bg-[#FF9F1C] text-white w-7 h-7 flex items-center justify-center rounded-full text-xs">🧑‍🧑‍🧒‍🧒</span>
+                    <span>成員：4大人 + 4小孩</span>
+                </div>
+                <div class="hidden sm:block text-[#4A3E3D]/30">|</div>
+                <div class="flex items-center gap-2 font-black text-sm md:text-base">
+                    <span class="bg-[#2EC4B6] text-white w-7 h-7 flex items-center justify-center rounded-full text-xs"><i class="fa-solid fa-car"></i></span>
+                    <span>租車自駕 🚗</span>
+                </div>
+                <div class="hidden sm:block text-[#4A3E3D]/30">|</div>
+                <div class="flex items-center gap-2 font-black text-sm md:text-base">
+                    <span class="bg-[#E71D36] text-white w-7 h-7 flex items-center justify-center rounded-full text-xs">🌺</span>
+                    <span>沖繩度假風 🏖️</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day Selector Tabs -->
+    <div class="max-w-6xl mx-auto px-4 mt-8">
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 md:gap-4">
+            <button onclick="switchDay(1)" id="tab-1" class="tab-active transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 1</span>
+                <span class="text-base md:text-lg">6/26 (五)</span>
+            </button>
+            <button onclick="switchDay(2)" id="tab-2" class="tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 2</span>
+                <span class="text-base md:text-lg">6/27 (六)</span>
+            </button>
+            <button onclick="switchDay(3)" id="tab-3" class="tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 3</span>
+                <span class="text-base md:text-lg">6/28 (日)</span>
+            </button>
+            <button onclick="switchDay(4)" id="tab-4" class="tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 4</span>
+                <span class="text-base md:text-lg">6/29 (一)</span>
+            </button>
+            <button onclick="switchDay(5)" id="tab-5" class="tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 5</span>
+                <span class="text-base md:text-lg">6/30 (二)</span>
+            </button>
+            <button onclick="switchDay(6)" id="tab-6" class="tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center">
+                <span class="text-xs uppercase opacity-75">DAY 6</span>
+                <span class="text-base md:text-lg">7/1 (三)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto px-4 mt-8">
+        
+        <!-- Day Banner Hero -->
+        <div id="day-banner" class="bg-gradient-to-r from-[#FFBD59] to-[#FF9F1C] japanese-border p-6 rounded-3xl mb-8 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+            <div class="absolute right-0 bottom-0 opacity-10 text-8xl font-black select-none pointer-events-none" id="bg-big-day">D1</div>
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-white text-[#FF9F1C] px-3 py-1 rounded-full text-sm font-black border-2 border-[#4A3E3D] shadow-[2px_2px_0px_#4A3E3D]" id="hero-day-num">DAY 1</span>
+                    <span class="font-bold text-lg text-white drop-shadow-md" id="hero-date">6/26 (五)</span>
+                </div>
+                <h2 class="text-2xl md:text-4xl font-black mt-2 drop-shadow-[2px_2px_0px_#4A3E3D]" id="hero-title">抵達沖繩．租車出發！</h2>
+                <p class="text-sm font-bold opacity-90 mt-1" id="hero-sub">開啟蔚藍之旅的冒險篇章，期待滿滿！</p>
+            </div>
+            
+            <!-- Quick info panel -->
+            <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3 flex items-center gap-2 flex-1 md:flex-none min-w-[120px]">
+                    <div class="text-2xl text-white"><i class="fa-solid fa-cloud-sun"></i></div>
+                    <div class="text-xs font-bold leading-tight">
+                        <div class="opacity-75">平均氣溫</div>
+                        <div id="hero-weather">27~31°C</div>
+                    </div>
+                </div>
+                <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3 flex items-center gap-2 flex-1 md:flex-none min-w-[120px]">
+                    <div class="text-2xl text-white"><i class="fa-solid fa-route"></i></div>
+                    <div class="text-xs font-bold leading-tight">
+                        <div class="opacity-75">本日移動距離</div>
+                        <div id="hero-distance">約 31 km</div>
+                    </div>
+                </div>
+                <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-3 flex items-center gap-2 flex-1 md:flex-none min-w-[120px]">
+                    <div class="text-2xl text-white"><i class="fa-solid fa-clock"></i></div>
+                    <div class="text-xs font-bold leading-tight">
+                        <div class="opacity-75">估計車程</div>
+                        <div id="hero-drive-time">約 50 分</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2 Column Layout (Left: Schedule | Right: Map & Info) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT COLUMN: ITINERARY TIMELINE (7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Time Schedule Panel -->
+                <div class="bg-[#FFFDF4] p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D]">
+                    <div class="flex items-center gap-2 border-b-2 border-[#4A3E3D]/20 pb-4 mb-6">
+                        <span class="bg-[#FF7B89] text-white p-2 rounded-xl text-lg border-2 border-[#4A3E3D]"><i class="fa-solid fa-route"></i></span>
+                        <h3 class="text-xl font-black">當日行程時間表</h3>
+                    </div>
+                    
+                    <!-- Timeline container -->
+                    <div class="relative pl-6 border-l-4 border-dashed border-[#FF7B89]/50 space-y-8" id="timeline-list">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: MAP & AUXILIARY INFO (5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Leaflet Interactive Map -->
+                <div class="bg-white p-4 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D] flex flex-col">
+                    <div class="flex items-center justify-between border-b-2 border-[#4A3E3D]/20 pb-3 mb-4">
+                        <div class="flex items-center gap-2">
+                            <span class="bg-[#2EC4B6] text-white p-2 rounded-xl text-lg border-2 border-[#4A3E3D]"><i class="fa-solid fa-map-location-dot"></i></span>
+                            <h3 class="text-lg font-black">當日遊玩導覽地圖</h3>
+                        </div>
+                        <span class="text-xs font-bold text-[#2EC4B6] bg-[#2EC4B6]/10 px-2.5 py-1 rounded-full border border-[#2EC4B6]/30">
+                            正確GPS定位
+                        </span>
+                    </div>
+                    
+                    <!-- Map Wrapper -->
+                    <div class="relative w-full h-[320px] md:h-[400px]">
+                        <div id="itinerary-map" class="w-full h-full z-10"></div>
+                        
+                        <!-- Map loading fallback or message -->
+                        <div class="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm z-20 px-3 py-1 rounded-lg text-xs font-black border border-[#4A3E3D] shadow-[2px_2px_0px_#4A3E3D]">
+                            📍 可縮放拖曳
+                        </div>
+                    </div>
+
+                    <!-- Daily Route Order -->
+                    <div class="mt-4 bg-[#F2F1E8] p-4 rounded-2xl border-2 border-[#4A3E3D]">
+                        <h4 class="text-sm font-black mb-2 flex items-center gap-1">
+                            <i class="fa-solid fa-list-ol text-[#FF9F1C]"></i> 今日路線順序：
+                        </h4>
+                        <ol class="text-xs font-bold leading-relaxed space-y-1 text-[#4A3E3D]/90" id="route-order-list">
+                            <!-- Filled dynamically -->
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Daily Gourmet Recommendation -->
+                <div class="bg-[#FFFDF4] p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D] relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-10"><i class="fa-solid fa-utensils"></i></div>
+                    <div class="flex items-center gap-2 border-b-2 border-[#4A3E3D]/20 pb-4 mb-4">
+                        <span class="bg-[#FF9F1C] text-white p-2 rounded-xl text-lg border-2 border-[#4A3E3D]"><i class="fa-solid fa-shrimp"></i></span>
+                        <h3 class="text-lg font-black">今日美食推薦 😋</h3>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gourmet-container">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+
+                <!-- Travel Tips Block -->
+                <div class="bg-[#EFFFFA] p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D]">
+                    <div class="flex items-center gap-2 border-b-2 border-[#4A3E3D]/20 pb-4 mb-4">
+                        <span class="bg-[#2EC4B6] text-white p-2 rounded-xl text-lg border-2 border-[#4A3E3D]"><i class="fa-solid fa-lightbulb"></i></span>
+                        <h3 class="text-lg font-black text-[#2EC4B6]">行程小 TIPS 💡</h3>
+                    </div>
+                    <ul class="space-y-3" id="tips-list">
+                        <!-- Filled dynamically -->
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Footer widgets (3 items) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            
+            <!-- Luggage Checklist -->
+            <div class="bg-white p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D]">
+                <h4 class="font-black text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-suitcase-rolling text-[#FF7B89]"></i> 行李清單小提醒
+                </h4>
+                <div class="grid grid-cols-2 gap-3 text-sm font-bold">
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>🪪</span> 護照/駕照日文譯本
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>💴</span> 日圓現金/信用卡
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>🧴</span> 防曬防蚊用品
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>👚</span> 換洗衣物/薄外套
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>💊</span> 小孩常備藥品
+                    </div>
+                    <div class="flex items-center gap-2 bg-[#FFFDF4] p-2.5 rounded-xl border-2 border-[#4A3E3D]/10">
+                        <span>📸</span> 相機/充電線/行動電源
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practical Information -->
+            <div class="bg-white p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D]">
+                <h4 class="font-black text-lg mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-[#2EC4B6]"></i> 沖繩實用資訊
+                </h4>
+                <ul class="space-y-3 text-sm font-bold">
+                    <li class="flex items-center justify-between border-b border-dashed pb-1.5 border-[#4A3E3D]/20">
+                        <span>⏰ 時差：</span>
+                        <span class="text-[#2EC4B6]">比台灣快 1 小時</span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-dashed pb-1.5 border-[#4A3E3D]/20">
+                        <span>🔌 電壓/插頭：</span>
+                        <span class="text-[#2EC4B6]">100V / 兩孔扁型 (同台灣)</span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-dashed pb-1.5 border-[#4A3E3D]/20">
+                        <span>🌦️ 天氣叮嚀：</span>
+                        <span class="text-[#2EC4B6]">夏天高溫防曬，準備雨傘/薄外套</span>
+                    </li>
+                    <li class="flex items-center justify-between border-b border-dashed pb-1.5 border-[#4A3E3D]/20">
+                        <span>🗣️ 語言：</span>
+                        <span class="text-[#2EC4B6]">日文 (觀光地區中文、英文可通)</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Heart-warming Memo -->
+            <div class="bg-[#FFFDF4] p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D] flex flex-col justify-between">
+                <div>
+                    <h4 class="font-black text-lg mb-3 flex items-center gap-2">
+                        <span class="animate-pulse">❤️</span> 給家人們的小叮嚀
+                    </h4>
+                    <p class="text-sm font-bold leading-relaxed text-[#4A3E3D]/80">
+                        這是我們兩家人一起創造回憶的第一天！放慢腳步，享受沖繩的陽光與海風，帶好相機，牽好孩子的手，開啟這趟最放鬆的家庭之旅！
+                    </p>
+                </div>
+                <div class="mt-4 pt-4 border-t-2 border-[#4A3E3D]/10 flex items-center gap-3">
+                    <div class="text-3xl">👨‍👩‍👧‍👦🏖️🚗</div>
+                    <div class="text-xs font-black text-[#FF7B89]">
+                        Let's Go! 沖縄めんそーれ！<br>(歡迎來到沖繩！)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- JS Logic Database of 6 days -->
+    <script>
+        // 6-day complete Okinawan dataset with accurate coordinate locations
+        const okinawaData = {
+            1: {
+                title: "抵達沖繩．租車出發！",
+                sub: "開啟蔚藍之旅的冒險篇章，期待滿滿！",
+                weather: "27~31°C 晴時多雲",
+                distance: "約 31 km",
+                driveTime: "約 50 分",
+                color: "from-[#FFBD59] to-[#FF9F1C]",
+                schedule: [
+                    { time: "08:00", title: "桃園機場 出發", desc: "搭乘中華航空 CI120 班機。飛行時間約 1 小時 45 分鐘，孩子們出發前先拍照留念唷！", tag: "飛行出發", type: "transport" },
+                    { time: "10:45", title: "那霸機場 抵達", desc: "入境並領取行李，填寫日本入境 VJW 碼更快速通關。", tag: "入關抵達", type: "airport" },
+                    { time: "11:55", title: "ポーたま 豬肉蛋飯糰 那覇空港", desc: "午餐時間！超人氣沖繩飯糰，厚切午餐肉與滑嫩蛋包。備案：麵や偶 もとなり 那覇空港店。", tag: "午餐時間", type: "food" },
+                    { time: "13:25", title: "OTS 租車", desc: "建議事先在網路上預約完成。辦理好租車手續，點交車輛，準備出發自駕冒險！", tag: "租車出發", type: "car" },
+                    { time: "14:05", title: "瀨長島 (Umikaji Terrace)", desc: "絕佳的海景拍照點！一排排純白建築搭配蔚藍晴空，感受沖繩的海風。可以近距離看到飛機起落！", tag: "海景拍照", type: "spot" },
+                    { time: "14:50", title: "Union超市 宇地泊店", desc: "採買補給！採購沖繩當地的生鮮、水果、零食、飲料、備品，一次買足！", tag: "採買補給", type: "shopping" },
+                    { time: "15:40", title: "DAISO 宜野灣店 & MEGA唐吉訶德", desc: "大肆採購！日常用品、零食餅乾、伴手禮、藥妝，超大商場超級好買！", tag: "購物時刻", type: "shopping" },
+                    { time: "17:25", title: "飯店 Check-in (Vessel Hotel Campana)", desc: "抵達北谷美國村的 Vessel Hotel Campana Okinawa！海景房寬敞舒適，讓身心充分放鬆，洗把臉休息一下！", tag: "休息一下", type: "hotel" },
+                    { time: "18:05", title: "はま寿司 北谷伊平店", desc: "晚餐時間！平價連鎖迴轉壽司，選擇超多元、食材新鮮，大人小孩都熱愛！", tag: "晚餐時間", type: "food" }
+                ],
+                gourmet: [
+                    { name: "ポーたま 豬肉蛋飯糰", desc: "沖繩必吃！熱騰騰的現做飯糰裹上海苔、蛋與經典餐肉。", emoji: "🍙" },
+                    { name: "はま寿司 (北谷伊平店)", desc: "新鮮現做迴轉壽司，多種美味壽司盤與點心，深受家庭客歡迎。", emoji: "🍣" }
+                ],
+                tips: [
+                    "<b>OTS 租車：</b> 建議出發前在台灣線上先填寫完預約與保險資料，現場辦手續、點車會更加快速省時唷！",
+                    "<b>瀨長島拍照：</b> 那裡是看飛機起降的絕佳地點，風可能稍微有點大，要幫孩子準備防曬或戴好帽子！",
+                    "<b>Union 超市：</b> 營業至深夜，可以在這裡採買整趟旅途需要的家庭裝大罐飲用水或果汁，放在後車廂備用。",
+                    "<b>Vessel Hotel：</b> 飯店地理位置超棒，附設免費大浴場，帶小孩進去泡澡洗去第一天的舟車勞頓最棒了！"
+                ],
+                mapCenter: [26.28, 127.70],
+                zoom: 11,
+                markers: [
+                    { lat: 26.2064, lng: 127.6465, name: "1. 那霸機場 / 豬肉蛋飯糰" },
+                    { lat: 26.2075, lng: 127.6590, name: "3. OTS 租車 (臨空豐崎店附近)" },
+                    { lat: 26.1744, lng: 127.6419, name: "4. 瀨長島" },
+                    { lat: 26.2750, lng: 127.7330, name: "5. Union超市 宇地泊店" },
+                    { lat: 26.2785, lng: 127.7390, name: "6. DAISO 宜野灣店" },
+                    { lat: 26.3150, lng: 127.7558, name: "7. Vessel Hotel Campana Okinawa" },
+                    { lat: 26.3243, lng: 127.7612, name: "8. はま寿司 北谷伊平店" }
+                ]
+            },
+            2: {
+                title: "踏浪彩繪．海島大冒險！",
+                sub: "乘著玻璃船窺探海底秘密，親手體驗風獅爺彩繪與夜空花火！",
+                weather: "28~32°C 晴天",
+                distance: "約 62 km",
+                driveTime: "約 1 小時 20 分",
+                color: "from-[#2EC4B6] to-[#011627]",
+                schedule: [
+                    { time: "08:20", title: "飯店吃完早餐 出發", desc: "在飯店享用豐富沖繩特色早餐，儲備好充足體力後，吹著海風愉快出征！", tag: "活力出發", type: "hotel" },
+                    { time: "09:15", title: "部瀨名海中公園 (坐玻璃船)", desc: "搭乘復古鯨魚玻璃底船出海！可以直接從船底玻璃觀賞五彩繽紛的珊瑚礁與無數熱帶魚，孩子絕對驚喜不斷！", tag: "海底觀光", type: "spot" },
+                    { time: "11:20", title: "海鮮料理 浜の家", desc: "午餐時間！超有名沖繩古民家風海鮮餐廳，招牌黃油烤魚、海膽飯及鮮魚定食，鮮美無比！", tag: "海鮮午餐", type: "food" },
+                    { time: "12:30", title: "琉球村 - 風獅爺彩繪 DIY", desc: "體驗沖繩傳統文化，兩家人一起親手彩繪屬於自己家庭風格的「Shisa(風獅爺)」，帶回台灣作最棒的紀念！", tag: "文化DIY", type: "spot" },
+                    { time: "14:15", title: "釣熱帶魚尋寶冒險之地", desc: "前往熱帶魚垂釣基地，由教練指導安全釣魚，認識沖繩豐富的海洋生態，體驗拉起美麗熱帶魚的成就感！", tag: "釣魚大冒險", type: "spot" },
+                    { time: "17:40", title: "焼肉きんぐ 北谷店", desc: "晚餐時間！全日本超人氣「燒肉王」吃到飽。多樣頂級肉品、石鍋拌飯、甜點無限點，大口吃肉超級滿足！", tag: "燒肉大餐", type: "food" },
+                    { time: "19:00", title: "美國村 散策購物", desc: "夜幕降臨，漫步在充滿濃厚美式異國風情的北谷美國村，霓虹燈光閃爍、各式精品雜貨林立，超級好逛！", tag: "異國逛街", type: "shopping" },
+                    { time: "19:40", title: "海岸看煙火 (週六20:00開始)", desc: "提早至岸邊或飯店陽台卡位，每週六晚間 20:00 準時施放美麗的海上花火，在夜空下與家人留下最浪漫的回憶！", tag: "海上煙火", type: "spot" }
+                ],
+                gourmet: [
+                    { name: "海鮮料理 浜の家", desc: "推薦必點「黃油烤海魚」，蒜香黃油澆在焦香鮮嫩的整條魚上，好吃到停不下來！", emoji: "🐟" },
+                    { name: "燒肉王 (焼肉きんぐ)", desc: "大人小孩都愛的燒肉吃到飽！厚切牛排、牛舌，還有專屬兒童菜單。", emoji: "🥩" }
+                ],
+                tips: [
+                    "<b>部瀨名玻璃船：</b> 建議出發前先查閱當天風浪與航班資訊，若當天天氣或風浪不佳可能會停開，需隨時彈性調整。",
+                    "<b>風獅爺 DIY：</b> 彩繪過程大約需 40~60 分鐘，繪製時請穿著不怕髒的衣服，或現場跟主辦索取防塵圍裙。",
+                    "<b>燒肉王預約：</b> 這家分店經常爆滿！極力建議提早透過官方 App 或線上提早卡位，才不會讓小孩在外面等太久餓肚子唷！",
+                    "<b>星期六煙火：</b> 最佳觀賞點在北谷日落沙灘海岸或 Vessel 飯店面向海灘的走廊，記得在 19:50 前就定位。"
+                ],
+                mapCenter: [26.46, 127.85],
+                zoom: 10,
+                markers: [
+                    { lat: 26.5401, lng: 127.9405, name: "2. 部瀨名海中公園" },
+                    { lat: 26.4385, lng: 127.7845, name: "3. 海鮮料理 浜の家" },
+                    { lat: 26.4420, lng: 127.7801, name: "4. 琉球村" },
+                    { lat: 26.4450, lng: 127.7500, name: "5. 釣熱帶魚基地 (近嘉手納)" },
+                    { lat: 26.3268, lng: 127.7592, name: "6. 焼肉きんぐ 北谷店" },
+                    { lat: 26.3150, lng: 127.7558, name: "7. 美國村 & Vessel Hotel" }
+                ]
+            },
+            3: {
+                title: "日落沙灘．悠閒度假天！",
+                sub: "在海風吹拂中品嚐鬆餅與拉麵，午後沉浸在永旺夢樂城的購物天堂！",
+                weather: "28~32°C 晴朗高溫",
+                distance: "約 20 km",
+                driveTime: "約 40 分",
+                color: "from-[#FF7B89] to-[#E71D36]",
+                schedule: [
+                    { time: "08:35", title: "Seaside Cafe Hanon 鬆餅", desc: "早餐時間！一邊望著蔚藍海景，一邊享用現點現烤、口感蓬鬆棉密的超人氣海景鬆餅，大人小孩的幸福晨光！", tag: "海景早餐", type: "food" },
+                    { time: "09:45", title: "北谷公園 日落沙灘 (Sunset Beach)", desc: "就在飯店前方！踩著細軟白沙、在安全管制區內戲水。清澈的海水跟豐富的貝殼，是孩子們的最愛！", tag: "沙灘玩水", type: "spot" },
+                    { time: "12:00", title: "京都北白川拉麵 魁力屋", desc: "午餐時間！品嚐特製醬油拉麵，濃郁豚骨高湯配上爽脆蔥花，還有大人小孩都愛的炸雞與炒飯！", tag: "美味拉麵", type: "food" },
+                    { time: "13:25", title: "永旺夢樂城 沖繩來客夢 (AEON Mall)", desc: "沖繩最大購物中心！擁有巨型觀賞魚缸，超好逛的服飾、玩具店（玩具反斗城/寶可夢中心），可以逛上一整天！", tag: "瘋狂購物", type: "shopping" },
+                    { time: "17:30", title: "永旺來客夢美食街", desc: "晚餐時間！美食街選擇繁多：和牛丼飯、章魚燒、烏龍麵等，每個人都可以自由挑選自己想吃的大餐！", tag: "美食街", type: "food" },
+                    { time: "18:50", title: "BLUE SEAL ICE PARK 北谷店", desc: "飯後點心！來到沖繩最經典的 BLUE SEAL 吃冰。品嚐美式海鹽、紅芋等沖繩限定口味，甜到心坎裡！", tag: "沖繩冰淇淋", type: "food" }
+                ],
+                gourmet: [
+                    { name: "Cafe Hanon 鬆餅", desc: "招牌「水果焦糖鬆餅」與鹹甜交織的鬆餅，搭配無敵海景超療癒。", emoji: "🥞" },
+                    { name: "BLUE SEAL 冰淇淋", desc: "沖繩NO.1冰品！推薦香草紅芋霜淇淋及鹽金楚糕口味。", emoji: "🍦" }
+                ],
+                tips: [
+                    "<b>日落沙灘戲水：</b> 請務必幫小孩準備泳衣、大毛巾、防曬乳與一套乾淨衣物。沙灘設有沖洗室，方便上岸後更衣清潔。",
+                    "<b>Cafe Hanon：</b> 這家店極為熱門且不開放現場排隊等候，若想坐陽台海景首排，一定要提早線上預約或一早前往開門搶位。",
+                    "<b>永旺來客夢：</b> 商場極大，進入時可以先用手機拍下「樓層指引地圖」及大門口編號，並隨時牽緊小孩防走失！",
+                    "<b>BLUE SEAL 北谷店：</b> 該店有部分區域可以預約 DIY 冰棒（ICE PARK 體驗），如想親自體驗需提前至官網報名喔！"
+                ],
+                mapCenter: [26.31, 127.77],
+                zoom: 12,
+                markers: [
+                    { lat: 26.3155, lng: 127.7540, name: "1. Seaside Cafe Hanon" },
+                    { lat: 26.3140, lng: 127.7530, name: "2. 北谷公園 日落沙灘" },
+                    { lat: 26.3262, lng: 127.7650, name: "3. 京都北白川拉麵 魁力屋 (北谷店)" },
+                    { lat: 26.3142, lng: 127.7940, name: "4. 永旺夢樂城 沖繩來客夢" },
+                    { lat: 26.3180, lng: 127.7570, name: "6. BLUE SEAL 北谷店" }
+                ]
+            },
+            4: {
+                title: "大溜滑梯．古寺與美食！",
+                sub: "祈福古寺淨化心靈，挑戰浦添超長溜滑梯，晚上吃著頂級敘敘苑與燒鳥！",
+                weather: "27~31°C 晴朗",
+                distance: "約 22 km",
+                driveTime: "約 45 分",
+                color: "from-[#4EA8DE] to-[#56CFE1]",
+                schedule: [
+                    { time: "08:30", title: "飯店辦理 Check Out 準備出發", desc: "整理行李，告別海景飯店。將大行李箱都上車裝箱，準備往南方那霸市區移動！", tag: "退房出發", type: "hotel" },
+                    { time: "09:05", title: "西來院 (達摩寺) 祈福", desc: "沖繩百年古寺。這裡有極其可愛的達摩吉祥物與不倒翁，帶領孩子們寫繪馬祈求闔家平安健康！", tag: "古寺參拜", type: "spot" },
+                    { time: "09:50", title: "浦添大公園 (C2 停車場)", desc: "滑梯天堂！擁有超長滾輪高空溜滑梯、繽紛攀爬架與沙坑，是孩子消耗精力的夢幻公園。大人也能在上面遠眺海景！", tag: "超長滑梯", type: "spot" },
+                    { time: "12:10", title: "敘敘苑 沖繩浦添 PARCO CITY", desc: "午餐時間！超人氣燒肉。已預約12:30！一邊俯瞰一覽無遺的沖繩西海岸，一邊享用軟嫩爆汁的頂級牛肉午間套餐！", tag: "頂級燒肉", type: "food" },
+                    { time: "13:20", title: "PARCO CITY 漫步購物", desc: "那霸最大海景百貨！店舖超齊全。有巨大阿卡將本舖、SAN-A大超市、各類精緻美妝，兩家人一起放鬆逛街購物！", tag: "海景購物", type: "shopping" },
+                    { time: "16:00", title: "沖繩媳婦 (採買)", desc: "伴手禮專賣店！購買在地人激推的各式沖繩點心、黑糖、伴手禮、土產，一站滿足回台送禮需求！", tag: "伴手禮", type: "shopping" },
+                    { time: "17:30", title: "飯店 Check-in（大和ROYNET飯店）", desc: "辦理入住 Daiwa Roynet Hotel Okinawa Kenchomae。地點緊鄰國際通，地鐵縣廳前站旁，機能極佳！", tag: "飯店入住", type: "hotel" },
+                    { time: "18:00", title: "鳥と卵の専門店 鳥玉 泉崎店", desc: "晚餐時間！雞肉與雞蛋的究極專賣店。酥脆多汁的南蠻雞、濃郁蓬鬆的玉子燒、親子丼，平價又好吃！", tag: "晚餐時間", type: "food" },
+                    { time: "19:30", title: "雪塩 國際通本店", desc: "點心時間！買些宮古島著名的雪塩霜淇淋，撒上柚子、芥末、可可等多種口味特色雪鹽調味，好吃又好玩！", tag: "雪鹽冰品", type: "food" }
+                ],
+                gourmet: [
+                    { name: "敘敘苑 燒肉 (PARCO)", desc: "「午間燒肉套餐」超划算！附泡菜、沙拉、湯品與哈密瓜冰淇淋。", emoji: "🥩" },
+                    { name: "鳥玉 雞肉專賣店", desc: "招牌「南蠻雞」與「黃金玉子燒」，厚實又香濃，大推！", emoji: "🍳" }
+                ],
+                tips: [
+                    "<b>浦添大公園停車：</b> 玩長溜滑梯與兒童設施一定要把導航定位在「C2停車場」，如果停錯其他入口會走超遠大斜坡唷！",
+                    "<b>敘敘苑午間時段：</b> 預約為 12:30，12:15 就可以先去排隊點餐，一定要在 12:30 前到場，逾時容易被取消預約。",
+                    "<b>長滑梯安全提示：</b> 滾輪溜滑梯磨擦係數較高，強烈建議給小孩攜帶「紙滑板」或戴上防滑手套保護小屁股！",
+                    "<b>大和ROYNET縣廳前：</b> 位於市中心。車子可以停飯店收費停車場（或對面公用停車場），方便我們步行前往國際通。"
+                ],
+                mapCenter: [26.23, 127.70],
+                zoom: 12,
+                markers: [
+                    { lat: 26.2208, lng: 127.7170, name: "2. 西來院 (達摩寺)" },
+                    { lat: 26.2480, lng: 127.7280, name: "3. 浦添大公園 C2區" },
+                    { lat: 26.2625, lng: 127.6975, name: "4. 敘敘苑 & PARCO CITY" },
+                    { lat: 26.2120, lng: 127.6780, name: "6. 大和ROYNET飯店 縣廳前" },
+                    { lat: 26.2110, lng: 127.6765, name: "8. 鳥と卵の専門店 鳥玉 泉崎店" },
+                    { lat: 26.2162, lng: 127.6845, name: "9. 雪塩國際通本店" }
+                ]
+            },
+            5: {
+                title: "數碼水族．繽紛購物祭！",
+                sub: "走進超夢幻DMM水族館，體驗 teamLab 聲光魔力，探訪那霸牧志市場老街風味！",
+                weather: "27~30°C 偶有陣雨",
+                distance: "約 25 km",
+                driveTime: "約 45 分",
+                color: "from-[#9B5DE5] to-[#F15BB5]",
+                schedule: [
+                    { time: "08:45", title: "飯店享用美味早餐後 出發", desc: "吃個元氣飽滿的日式、西式複合早餐，今天有精采的水族館與超酷的 teamLab 光影展覽等待大家！", tag: "晨間出征", type: "hotel" },
+                    { time: "09:10", title: "DMM かりゆし水族館", desc: "新概念科技水族館！利用最新的影像科技與真實生態結合，可以赤腳走在大片玻璃地板上看下方遨遊的鯊魚群！", tag: "夢幻水族", type: "spot" },
+                    { time: "11:55", title: "JEF 豊見城店", desc: "午餐時間！沖繩本地限定的傳奇美式漢堡店，大膽點招牌「苦瓜煎蛋漢堡」與酥炸苦瓜圈，香氣十足，全無苦澀！", tag: "苦瓜漢堡", type: "food" },
+                    { time: "13:20", title: "DFS ( teamLab 3F )", desc: "視覺震撼！DFS環球免稅店3樓常設 teamLab 未來遊樂園。包含光球管弦樂團、塗鴉大自然等互動體驗，拍照神美！", tag: "teamLab光影", type: "spot" },
+                    { time: "15:30", title: "第一牧志公設市場", desc: "那霸的廚房！傳統色彩鮮明的老街與市集。可以挑選五顏六色的深海鮮魚，在市場內買些道地沖繩和牛串或天婦羅！", tag: "懷舊市場", type: "shopping" },
+                    { time: "17:20", title: "駿河屋 那覇沖映通り店", desc: "玩具動漫天堂！全家一齊探寶，超多經典與當紅的卡通公仔、二手卡牌、動漫周邊，在這裡絕對逛到忘記時間！", tag: "動漫尋寶", type: "shopping" },
+                    { time: "18:15", title: "我那覇豚肉店 前島總店", desc: "晚餐時間！沖繩著名的「AGU豬」涮涮鍋。極其鮮嫩甘甜的粉嫩肉片入口即化，高湯清甜，是今天完美的收尾！", tag: "頂級火鍋", type: "food" }
+                ],
+                gourmet: [
+                    { name: "JEF 苦瓜蛋漢堡", desc: "軟綿蛋皮包覆著微苦帶甘的沖繩苦瓜，搭配起司，口味非常和諧！", emoji: "🍔" },
+                    { name: "我那霸豚肉店 (AGU豬)", desc: "主打阿古黑毛豬，粉紅色澤的肉片燙 5 秒即可，肉質極致細緻甜美。", emoji: "🍲" }
+                ],
+                tips: [
+                    "<b>DMM 水族館：</b> 館內結合大量手機 APP 互動，建議一入場先下載館方的官方手機 APP，觸碰特定點能蒐集虛擬海洋生物喔！",
+                    "<b>teamLab 3F：</b> 這個光影展非常注重互動，穿淺色衣物（最好是白色）拍照時投影在身上效果最好！",
+                    "<b>第一牧志公設市場：</b> 裡面有多條錯綜複雜的小巷，路面偶爾比較潮濕，帶小嬰兒的話建議使用嬰兒背帶代替手推車。",
+                    "<b>我那霸豚肉店：</b> 人氣極盛，如果是週末或用餐尖峰時間前往，強烈建議下午先打電話預約訂位，避免現場等候。"
+                ],
+                mapCenter: [26.19, 127.68],
+                zoom: 12,
+                markers: [
+                    { lat: 26.1578, lng: 127.6534, name: "2. DMM かりゆし水族館" },
+                    { lat: 26.1645, lng: 127.6740, name: "3. JEF 豊見城店" },
+                    { lat: 26.2223, lng: 127.6970, name: "4. DFS T Galleria (teamLab)" },
+                    { lat: 26.2145, lng: 127.6885, name: "5. 第一牧志公設市場" },
+                    { lat: 26.2185, lng: 127.6872, name: "6. 駿河屋 那覇沖映通り店" },
+                    { lat: 26.2225, lng: 127.6830, name: "7. 我那覇豚肉店 前島總店" }
+                ]
+            },
+            6: {
+                title: "滿載而歸．珍重再見！",
+                sub: "順利還車、踏上歸途。沖繩，我們下次還要一起來玩！",
+                weather: "27~31°C 晴天",
+                distance: "約 15 km",
+                driveTime: "約 30 分",
+                color: "from-[#A2D2FF] to-[#BDE0FE]",
+                schedule: [
+                    { time: "08:30", title: "OTS 還車手續", desc: "打包好六天買好買滿的戰利品。開車前往 OTS 臨空豐崎營業所還車。記得還車前要依照規定把汽油加滿唷！", tag: "加滿還車", type: "car" },
+                    { time: "09:15", title: "那霸機場 抵達", desc: "搭乘 OTS 提供的免費接駁巴士抵達那霸機場。辦理行李托運，手續完成後可以去國際/國內線免稅店最後採購！", tag: "機場報到", type: "airport" },
+                    { time: "11:55", title: "坐飛機回家囉！", desc: "搭乘中華航空 CI121 班機返台。結束 6 天充滿歡笑、美食與陽光的沖繩自駕親子之旅，收穫滿滿的回憶！", tag: "起飛回家", type: "transport" }
+                ],
+                gourmet: [
+                    { name: "機場國內線 伴手禮街", desc: "起飛前做最後的甜點採買！包括Royce黑糖巧克力、藍海鹽年輪蛋糕等。", emoji: "🎁" }
+                ],
+                tips: [
+                    "<b>還車規定：</b> 還車前需在距離營業所最近的加油站將汽油加滿，並記得妥善保管並出示該加油站的收據（發票）核對！",
+                    "<b>機場採購：</b> 那霸機場國內線二樓非常好逛，各式點心、土產、Royce 應有盡有，建議辦完託運後去國內線挖寶！",
+                    "<b>手提行李限制：</b> 回程行李通常很多，記得注意每人隨身手提行李的限重與件數限制，液體伴手禮一定要妥善放進大行李箱託運。",
+                    "<b>出境時間：</b> 暑假與連假期間機場通關人潮可能較多，一定要在起飛前 2.5 小時抵達機場辦理報到，保留餘裕。"
+                ],
+                mapCenter: [26.17, 127.65],
+                zoom: 12,
+                markers: [
+                    { lat: 26.1510, lng: 127.6575, name: "1. OTS 臨空豐崎店還車" },
+                    { lat: 26.2064, lng: 127.6465, name: "2. 那霸機場 (國內/國際航廈)" }
+                ]
+            }
+        };
+
+        // Initialize Global Leaflet Map
+        let map;
+        let activeMarkers = [];
+        let polyline = null;
+
+        function initMap() {
+            // Standard center on Okinawa
+            map = L.map('itinerary-map', {
+                center: [26.28, 127.70],
+                zoom: 11,
+                zoomControl: true,
+                scrollWheelZoom: false // disable zoom scroll to make page browsing smooth
+            });
+
+            // Modern cute pastel map tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                maxZoom: 19
+            }).addTo(map);
+        }
+
+        function updateMapForDay(dayNum) {
+            const data = okinawaData[dayNum];
+            
+            // Clear existing markers
+            activeMarkers.forEach(marker => map.removeLayer(marker));
+            activeMarkers = [];
+
+            // Clear existing line
+            if (polyline) {
+                map.removeLayer(polyline);
+            }
+
+            // Create custom icons representing the day's stop index
+            const markerCoords = [];
+
+            data.markers.forEach((markerData, idx) => {
+                const cuteIcon = L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="bg-[#FF7B89] text-white text-[11px] font-black w-6 h-6 rounded-full border-2 border-[#4A3E3D] flex items-center justify-center shadow-[2px_2px_0px_#4A3E3D]">${idx + 1}</div>`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                });
+
+                const marker = L.marker([markerData.lat, markerData.lng], { icon: cuteIcon })
+                    .bindPopup(`<div class="font-black text-xs text-[#4A3E3D]">${markerData.name}</div>`)
+                    .addTo(map);
+                
+                activeMarkers.push(marker);
+                markerCoords.push([markerData.lat, markerData.lng]);
+            });
+
+            // Draw route line
+            if (markerCoords.length > 1) {
+                polyline = L.polyline(markerCoords, {
+                    color: '#FF7B89',
+                    weight: 4,
+                    opacity: 0.8,
+                    dashArray: '6, 6'
+                }).addTo(map);
+            }
+
+            // Fly smoothly to map area
+            map.setView(data.mapCenter, data.zoom);
+        }
+
+        // Switch Days Main Function
+        function switchDay(dayNum) {
+            // Update Tab UI
+            for (let i = 1; i <= 6; i++) {
+                const tab = document.getElementById(`tab-${i}`);
+                if (i === dayNum) {
+                    tab.className = "tab-active transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center";
+                } else {
+                    tab.className = "tab-inactive transition-all duration-200 py-3 rounded-2xl border-3 font-black text-center flex flex-col items-center justify-center";
+                }
+            }
+
+            const data = okinawaData[dayNum];
+
+            // Update Hero Banner
+            const heroDayNum = document.getElementById('hero-day-num');
+            const heroDate = document.getElementById('hero-date');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSub = document.getElementById('hero-sub');
+            const heroWeather = document.getElementById('hero-weather');
+            const heroDistance = document.getElementById('hero-distance');
+            const heroDriveTime = document.getElementById('hero-drive-time');
+            const bgBigDay = document.getElementById('bg-big-day');
+            const dayBanner = document.getElementById('day-banner');
+
+            heroDayNum.textContent = `DAY ${dayNum}`;
+            heroDate.textContent = (dayNum === 1) ? "6/26 (五)" : (dayNum === 2) ? "6/27 (六)" : (dayNum === 3) ? "6/28 (日)" : (dayNum === 4) ? "6/29 (一)" : (dayNum === 5) ? "6/30 (二)" : "7/1 (三)";
+            heroTitle.textContent = data.title;
+            heroSub.textContent = data.sub;
+            heroWeather.textContent = data.weather;
+            heroDistance.textContent = data.distance;
+            heroDriveTime.textContent = data.driveTime;
+            bgBigDay.textContent = `D${dayNum}`;
+            
+            // Adjust header background color gradient smoothly
+            dayBanner.className = `bg-gradient-to-r ${data.color} japanese-border p-6 rounded-3xl mb-8 text-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden`;
+
+            // Update Timeline List
+            const timelineList = document.getElementById('timeline-list');
+            timelineList.innerHTML = '';
+            
+            data.schedule.forEach((item, index) => {
+                let iconHtml = '<i class="fa-solid fa-camera"></i>';
+                let iconBg = 'bg-[#4EA8DE]';
+                
+                if (item.type === 'transport') {
+                    iconHtml = '<i class="fa-solid fa-plane-departure"></i>';
+                    iconBg = 'bg-[#FF9F1C]';
+                } else if (item.type === 'airport') {
+                    iconHtml = '<i class="fa-solid fa-plane-arrival"></i>';
+                    iconBg = 'bg-[#A2D2FF]';
+                } else if (item.type === 'food') {
+                    iconHtml = '<i class="fa-solid fa-utensils"></i>';
+                    iconBg = 'bg-[#FF7B89]';
+                } else if (item.type === 'car') {
+                    iconHtml = '<i class="fa-solid fa-car"></i>';
+                    iconBg = 'bg-[#2EC4B6]';
+                } else if (item.type === 'shopping') {
+                    iconHtml = '<i class="fa-solid fa-cart-shopping"></i>';
+                    iconBg = 'bg-[#FFBD59]';
+                } else if (item.type === 'hotel') {
+                    iconHtml = '<i class="fa-solid fa-hotel"></i>';
+                    iconBg = 'bg-[#9B5DE5]';
+                }
+
+                const itemHtml = `
+                    <div class="relative transition-all duration-300 hover:translate-x-1">
+                        <!-- Left dot -->
+                        <div class="absolute -left-[38px] top-1 ${iconBg} text-white w-9 h-9 rounded-full border-3 border-[#4A3E3D] flex items-center justify-center shadow-[2px_2px_0px_#4A3E3D] z-10 text-xs">
+                            ${iconHtml}
+                        </div>
+                        
+                        <!-- Content Card -->
+                        <div class="bg-white p-4 rounded-2xl border-2 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D]">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[#FF7B89] font-black text-base md:text-lg bg-[#FF7B89]/10 px-2.5 py-0.5 rounded-lg border border-[#FF7B89]/20">${item.time}</span>
+                                    <h4 class="font-black text-sm md:text-base text-[#4A3E3D]">${index+1}. ${item.title}</h4>
+                                </div>
+                                <span class="text-xs font-black px-2 py-0.5 rounded-md ${iconBg} text-white border-2 border-[#4A3E3D]">
+                                    ${item.tag}
+                                </span>
+                            </div>
+                            <p class="text-xs md:text-sm font-bold text-[#4A3E3D]/80 leading-relaxed">${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+                timelineList.innerHTML += itemHtml;
+            });
+
+            // Update Route Order List
+            const routeOrderList = document.getElementById('route-order-list');
+            routeOrderList.innerHTML = '';
+            data.markers.forEach((markerData, idx) => {
+                routeOrderList.innerHTML += `<li class="flex items-center gap-1"><span class="bg-[#4A3E3D] text-white w-4 h-4 rounded-full inline-flex items-center justify-center text-[10px] font-bold">${idx + 1}</span> ${markerData.name}</li>`;
+            });
+
+            // Update Gourmet Recommended
+            const gourmetContainer = document.getElementById('gourmet-container');
+            gourmetContainer.innerHTML = '';
+            data.gourmet.forEach(food => {
+                gourmetContainer.innerHTML += `
+                    <div class="bg-white p-3.5 rounded-2xl border-2 border-[#4A3E3D] shadow-[2px_2px_0px_#4A3E3D] flex items-start gap-2.5">
+                        <div class="text-3xl">${food.emoji}</div>
+                        <div>
+                            <h5 class="font-black text-sm text-[#4A3E3D]">${food.name}</h5>
+                            <p class="text-xs font-bold text-[#4A3E3D]/70 mt-1 leading-snug">${food.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update Tips List
+            const tipsList = document.getElementById('tips-list');
+            tipsList.innerHTML = '';
+            data.tips.forEach(tip => {
+                tipsList.innerHTML += `
+                    <li class="flex items-start gap-2 text-xs md:text-sm font-bold leading-relaxed">
+                        <span class="text-[#2EC4B6] mt-0.5"><i class="fa-solid fa-circle-check"></i></span>
+                        <span>${tip}</span>
+                    </li>
+                `;
+            });
+
+            // Update Map Points
+            updateMapForDay(dayNum);
+        }
+
+        // Wait for page resources to load
+        window.onload = function() {
+            initMap();
+            switchDay(1); // load day 1 default
+        };
+    </script>
+</body>
+</html>
