@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兩家人沖繩旅遊預約與費用試算表 🌺</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (Cute Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas for image downloading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+TC:wght@400;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', 'Kosugi Maru', sans-serif;
+            background-color: #FFFDF4;
+            background-image: radial-gradient(#F7E6C4 1.2px, #FFFDF4 1.2px);
+            background-size: 24px 24px;
+        }
+
+        .japanese-border {
+            border: 3px solid #4A3E3D;
+            box-shadow: 4px 4px 0px #4A3E3D;
+        }
+
+        .soft-shadow {
+            box-shadow: 0 4px 14px rgba(74, 62, 61, 0.08);
+        }
+
+        .cute-badge {
+            border: 2px solid #4A3E3D;
+            box-shadow: 2px 2px 0px #4A3E3D;
+        }
+
+        .status-badge-ok {
+            background-color: #2EC4B6;
+            color: white;
+            border: 1.5px solid #4A3E3D;
+        }
+
+        .status-badge-pending {
+            background-color: #FF9F1C;
+            color: white;
+            border: 1.5px solid #4A3E3D;
+        }
+
+        .status-badge-local {
+            background-color: #4EA8DE;
+            color: white;
+            border: 1.5px solid #4A3E3D;
+        }
+
+        .status-badge-danger {
+            background-color: #FF7B89;
+            color: white;
+            border: 1.5px solid #4A3E3D;
+        }
+
+        /* Loading indicator for canvas rendering */
+        #loader {
+            display: none;
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="text-[#4A3E3D] pb-16 antialiased">
+
+    <!-- Header Banner Area -->
+    <div class="relative overflow-hidden bg-gradient-to-b from-[#A2D2FF] to-[#E8F0FE] border-b-4 border-[#4A3E3D] py-8 px-4 text-center">
+        <!-- Cute Deco icons -->
+        <div class="absolute top-4 left-6 text-4xl opacity-30 animate-bounce"><i class="fa-solid fa-cloud text-white"></i></div>
+        <div class="absolute top-6 right-10 text-3xl opacity-20"><i class="fa-solid fa-plane text-[#FF7B89] -rotate-12"></i></div>
+        <div class="absolute bottom-2 left-10 text-5xl opacity-20 text-[#FFBD59]"><i class="fa-solid fa-umbrella-beach"></i></div>
+        
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center gap-2 bg-[#FF7B89] text-white px-4 py-1.5 rounded-full font-black text-xs md:text-sm border-2 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D] mb-4">
+                <i class="fa-solid fa-file-invoice-dollar"></i> 兩家人的沖繩旅遊
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black tracking-wider mb-2 drop-shadow-[2px_2px_0px_rgba(255,255,255,0.8)]">
+                預約明細與家庭費用試算 🌺
+            </h1>
+            <p class="text-xs md:text-sm font-bold text-[#557A95]">
+                輕鬆管理單一家庭（2大2小）的所有餐廳預訂與行程門票開銷！
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Section -->
+    <main class="max-w-5xl mx-auto px-4 mt-8">
+        
+        <!-- Controls & Parameter card -->
+        <div class="bg-white p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[4px_4px_0px_#4A3E3D] mb-8">
+            <div class="flex flex-col md:flex-row gap-6 items-center justify-between">
+                
+                <!-- Exchange rate & Base Setup -->
+                <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-[#FFBD59] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 border-[#4A3E3D] font-black">¥</span>
+                        <div>
+                            <label class="block text-[10px] font-black opacity-75">今日日圓匯率 (JPY ➔ TWD)</label>
+                            <input type="number" id="exchange-rate" value="0.215" step="0.001" oninput="recalculateAll()" class="w-24 bg-[#FFFDF4] border-2 border-[#4A3E3D] rounded-xl px-2.5 py-1 text-sm font-black focus:outline-none focus:ring-2 focus:ring-[#FF7B89]">
+                        </div>
+                    </div>
+
+                    <div class="hidden sm:block text-[#4A3E3D]/30 text-xl">|</div>
+
+                    <!-- Split formula description -->
+                    <div class="text-xs font-bold leading-relaxed text-[#4A3E3D]/80">
+                        📌 <b>預算檢視規則：</b><br>
+                        • 以下所有金額與總和，皆已自動換算為<b>「單一家庭（2大2小）」</b>所需負擔的費用。<br>
+                        • 景點與門票已整合至專屬表格，每日預約僅專注呈現餐廳狀態。
+                    </div>
+                </div>
+
+                <!-- PDF / Image Downloader Button -->
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <button onclick="downloadAsImage()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-[#FF7B89] hover:bg-[#ff6172] text-white px-5 py-3 rounded-2xl font-black text-sm border-3 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D] transition-all hover:-translate-y-0.5 active:translate-y-0">
+                        <i class="fa-solid fa-file-image"></i> 下載為精美圖片
+                    </button>
+                    <button onclick="window.print()" class="flex-1 md:flex-none inline-flex items-center justify-center gap-2 bg-[#2EC4B6] hover:bg-[#25ab9e] text-white px-5 py-3 rounded-2xl font-black text-sm border-3 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D] transition-all hover:-translate-y-0.5 active:translate-y-0">
+                        <i class="fa-solid fa-file-pdf"></i> 列印 / 另存 PDF
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Print Container for Snapshot -->
+        <div id="printable-area" class="p-1">
+            <div class="bg-[#FFFDF4] p-4 md:p-6 rounded-3xl border-3 border-[#4A3E3D] shadow-[6px_6px_0px_#4A3E3D] space-y-8">
+                
+                <!-- Title & Logo inside snapshot -->
+                <div class="flex items-center justify-between border-b-3 border-dashed border-[#4A3E3D]/20 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-4xl">🦁🎏</div>
+                        <div>
+                            <h2 class="text-2xl font-black tracking-wide">沖繩自駕行．單一家庭預約與費用手札</h2>
+                            <p class="text-xs font-bold text-[#4A3E3D]/60">最後更新：2026 夏季最新旅行配置</p>
+                        </div>
+                    </div>
+                    <div class="text-right hidden sm:block">
+                        <span class="text-xs font-black text-[#FF7B89] bg-[#FF7B89]/10 px-3 py-1 rounded-full border border-[#FF7B89]/30">單一家庭 (2大2小) 專用</span>
+                    </div>
+                </div>
+
+                <!-- 1. Cost Summary Cards (Modified to show only Single Family Total & Pre-pay) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Card 1: Single Family Grand Total -->
+                    <div class="bg-[#FFF8E7] p-5 rounded-2xl border-2 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-black text-[#FF9F1C] bg-[#FF9F1C]/10 px-3 py-0.5 rounded-full border border-[#FF9F1C]/20">一個家庭．總門票活動估計費用</span>
+                            <span class="text-lg">👨‍👩‍👧‍👦</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-2xl font-black text-[#4A3E3D]"><span id="single-family-total-jpy">0</span> <span class="text-sm">JPY</span></div>
+                            <div class="text-sm font-black text-[#4A3E3D]/70">折合台幣約：<span class="text-base text-[#E2725B]" id="single-family-total-twd">0</span> TWD</div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Single Family Pre-paid required -->
+                    <div class="bg-[#FFEDF0] p-5 rounded-2xl border-2 border-[#4A3E3D] shadow-[3px_3px_0px_#4A3E3D]">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-black text-[#FF7B89] bg-[#FF7B89]/10 px-3 py-0.5 rounded-full border border-[#FF7B89]/20">一個家庭．需先預訂付費金額 (出發前刷卡)</span>
+                            <span class="text-lg">💳</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-2xl font-black text-[#FF7B89]"><span id="single-family-prepay-jpy">0</span> <span class="text-sm">JPY</span></div>
+                            <div class="text-sm font-black text-[#4A3E3D]/70">折合台幣約：<span class="text-base text-[#FF7B89]" id="single-family-prepay-twd">0</span> TWD</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. TABLE: Ticket & Activities Fees (Modified to show only Single Family Cost) -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-black flex items-center gap-2 border-l-4 border-[#2EC4B6] pl-3.5">
+                        <i class="fa-solid fa-ticket text-[#2EC4B6]"></i> 景點門票與活動費用明細表 (單一家庭 2大2小 額度)
+                    </h3>
+                    
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs md:text-sm font-bold text-left border-collapse">
+                                <thead class="bg-[#EFFFFA] border-b-2 border-[#4A3E3D]">
+                                    <tr>
+                                        <th class="p-3 text-left">景點項目名稱</th>
+                                        <th class="p-3 text-left">兩家全體總人數與費用原申報</th>
+                                        <th class="p-3 class-center">購買/預訂狀態</th>
+                                        <th class="p-3 text-right">一個家庭費用 (日圓 50%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-[#4A3E3D]/10">
+                                    <!-- Item 1: Marine Park -->
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="p-3 font-black">部瀨名海中公園 (玻璃船)</td>
+                                        <td class="p-3 text-[#4A3E3D]/80">大人 ¥2100/2人、小孩 ¥2100/2人 (全體總額 ¥4200)</td>
+                                        <td class="p-3">
+                                            <span class="status-badge-local text-[10px] px-2 py-0.5 rounded-full font-black">現場買</span>
+                                        </td>
+                                        <td class="p-3 text-right text-[#FF9F1C] font-black">¥2,100</td>
+                                    </tr>
+                                    <!-- Item 2: Ryukyu Mura -->
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="p-3 font-black">琉球村 (手作彩繪 DIY)</td>
+                                        <td class="p-3 text-[#4A3E3D]/80">大人用 Funpass / 小孩手作彩繪費 ¥4400/2人 (全體總額 ¥4400)</td>
+                                        <td class="p-3">
+                                            <span class="status-badge-danger text-[10px] px-2 py-0.5 rounded-full font-black">需先預訂付費</span>
+                                        </td>
+                                        <td class="p-3 text-right text-[#FF7B89] font-black">¥2,200</td>
+                                    </tr>
+                                    <!-- Item 3: Fishing Spot -->
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="p-3 font-black">釣熱帶魚尋寶大冒險</td>
+                                        <td class="p-3 text-[#4A3E3D]/80">大人 ¥5340/2人、小學生 ¥2160/人、未滿小學 ¥1860/人 (全體總額 ¥9360)</td>
+                                        <td class="p-3">
+                                            <span class="status-badge-local text-[10px] px-2 py-0.5 rounded-full font-black">現場買</span>
+                                        </td>
+                                        <td class="p-3 text-right text-[#FF9F1C] font-black">¥4,680</td>
+                                    </tr>
+                                    <!-- Item 4: DMM -->
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="p-3 font-black">DMM かりゆし水族館</td>
+                                        <td class="p-3 text-[#4A3E3D]/80">大人使用 Funpass。兒童門票：¥3780/2人 (全體總額 ¥3780)</td>
+                                        <td class="p-3">
+                                            <span class="status-badge-local text-[10px] px-2 py-0.5 rounded-full font-black">現場買</span>
+                                        </td>
+                                        <td class="p-3 text-right text-[#FF9F1C] font-black">¥1,890</td>
+                                    </tr>
+                                    <!-- Item 5: TeamLab -->
+                                    <tr class="hover:bg-gray-50/50">
+                                        <td class="p-3 font-black">TeamLab 未來遊樂園</td>
+                                        <td class="p-3 text-[#4A3E3D]/80">大人 ¥4000/2人、兒童 ¥2400/2人 (全體總額 ¥6400)</td>
+                                        <td class="p-3">
+                                            <span class="status-badge-danger text-[10px] px-2 py-0.5 rounded-full font-black">需先預訂付費</span>
+                                        </td>
+                                        <td class="p-3 text-right text-[#FF7B89] font-black">¥3,200</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Detailed Dining Schedule Ledger (Focusing ONLY on Meals) -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-black flex items-center gap-2 border-l-4 border-[#FF7B89] pl-3.5">
+                        <i class="fa-solid fa-utensils text-[#FF7B89]"></i> 每日餐廳預約狀況手札 (單一家庭對照版)
+                    </h3>
+
+                    <!-- Day 1 Segment -->
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="bg-[#FFF8E7] px-4 py-3 border-b-2 border-[#4A3E3D] flex items-center justify-between">
+                            <span class="font-black text-sm md:text-base"><span class="bg-[#FF9F1C] text-white px-2 py-0.5 rounded text-xs mr-2 border border-[#4A3E3D]">DAY 1</span> 6/26 (五) ．餐廳預定狀況</span>
+                            <span class="text-xs font-black text-orange-600">啟程沖繩 ✈</span>
+                        </div>
+                        <div class="divide-y divide-[#4A3E3D]/10 text-xs md:text-sm font-bold">
+                            <!-- Item: Hama Sushi -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">晚餐</span>
+                                        <h4 class="font-black text-sm md:text-base">はま寿司 北谷伊平店</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：官方規定用餐前 15 天 (即 6/11) 才能開放線上訂位，記得設行事曆提醒預訂喔！</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-pending text-[11px] px-2.5 py-1 rounded-full font-black">6/11 開放預訂</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 2 Segment -->
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="bg-[#EFFFFA] px-4 py-3 border-b-2 border-[#4A3E3D] flex items-center justify-between">
+                            <span class="font-black text-sm md:text-base"><span class="bg-[#2EC4B6] text-white px-2 py-0.5 rounded text-xs mr-2 border border-[#4A3E3D]">DAY 2</span> 6/27 (六) ．餐廳預定狀況</span>
+                            <span class="text-xs font-black text-emerald-600">海景烤魚與極致燒肉 🥩</span>
+                        </div>
+                        <div class="divide-y divide-[#4A3E3D]/10 text-xs md:text-sm font-bold">
+                            <!-- Item: Hamaya Lunch -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">午餐</span>
+                                        <h4 class="font-black text-sm md:text-base">海鮮料理 浜の家</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：預計 6 月初請白金秘書打電話預約訂位。</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-pending text-[11px] px-2.5 py-1 rounded-full font-black">6月請白金秘書訂</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+
+                            <!-- Item: Yakiniku King -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">晚餐</span>
+                                        <h4 class="font-black text-sm md:text-base">燒肉王 (焼肉きんぐ 北谷店)</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">✅ 狀態：已預訂成功！18:00 / 4人 乙桌 ＆ 18:15 / 4人 乙桌 (分開入座，共兩桌)</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-ok text-[11px] px-2.5 py-1 rounded-full font-black">已預訂成功</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 3 Segment -->
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="bg-[#FFEDF0] px-4 py-3 border-b-2 border-[#4A3E3D] flex items-center justify-between">
+                            <span class="font-black text-sm md:text-base"><span class="bg-[#FF7B89] text-white px-2 py-0.5 rounded text-xs mr-2 border border-[#4A3E3D]">DAY 3</span> 6/28 (日) ．餐廳預定狀況</span>
+                            <span class="text-xs font-black text-rose-600">魁力屋與來客夢美食街 🍜</span>
+                        </div>
+                        <div class="divide-y divide-[#4A3E3D]/10 text-xs md:text-sm font-bold">
+                            <!-- Item: lunch -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">午餐</span>
+                                        <h4 class="font-black text-sm md:text-base">京都北白川拉麵魁力屋 (北谷店)</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：無須預約，現場排隊點餐即可。</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-local text-[11px] px-2.5 py-1 rounded-full font-black">現場排隊</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+
+                            <!-- Item: dinner -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">晚餐</span>
+                                        <h4 class="font-black text-sm md:text-base">永旺夢樂城來客夢美食街</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：美食街各自尋找喜好，自由結帳用餐。</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-local text-[11px] px-2.5 py-1 rounded-full font-black">美食街自理</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 4 Segment -->
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="bg-[#EAF4F4] px-4 py-3 border-b-2 border-[#4A3E3D] flex items-center justify-between">
+                            <span class="font-black text-sm md:text-base"><span class="bg-[#4EA8DE] text-white px-2 py-0.5 rounded text-xs mr-2 border border-[#4A3E3D]">DAY 4</span> 6/29 (一) ．餐廳預定狀況</span>
+                            <span class="text-xs font-black text-blue-600">頂級敘敘苑與鳥玉親子料理 🍳</span>
+                        </div>
+                        <div class="divide-y divide-[#4A3E3D]/10 text-xs md:text-sm font-bold">
+                            <!-- Item: Jojoen lunch -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">午餐</span>
+                                        <h4 class="font-black text-sm md:text-base">敘敘苑 沖繩浦添 PARCO CITY 店</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">✅ 狀態：已預訂成功！12:30 入席 (已保留 2 桌，享面海窗景)</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-ok text-[11px] px-2.5 py-1 rounded-full font-black">已預訂成功</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+
+                            <!-- Item: Toritama dinner -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">晚餐</span>
+                                        <h4 class="font-black text-sm md:text-base">鳥と卵の専門店 鳥玉 泉崎店</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：無須預約，現場排隊，體驗平價高CP值雞蛋雞肉專門店。</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-local text-[11px] px-2.5 py-1 rounded-full font-black">現場排隊</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Day 5 Segment -->
+                    <div class="border-2 border-[#4A3E3D] rounded-2xl overflow-hidden bg-white shadow-[2px_2px_0px_#4A3E3D]">
+                        <div class="bg-[#F3E8FF] px-4 py-3 border-b-2 border-[#4A3E3D] flex items-center justify-between">
+                            <span class="font-black text-sm md:text-base"><span class="bg-[#9B5DE5] text-white px-2 py-0.5 rounded text-xs mr-2 border border-[#4A3E3D]">DAY 5</span> 6/30 (二) ．餐廳預定狀況</span>
+                            <span class="text-xs font-black text-purple-600">苦瓜美式漢堡與 AGU 豬 🍲</span>
+                        </div>
+                        <div class="divide-y divide-[#4A3E3D]/10 text-xs md:text-sm font-bold">
+                            <!-- Item: JEF lunch -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">午餐</span>
+                                        <h4 class="font-black text-sm md:text-base">JEF 苦瓜漢堡 豊見城店</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">📌 備忘：體驗沖繩限定傳奇美式苦瓜蛋漢堡，現場排隊臨櫃點餐。</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-local text-[11px] px-2.5 py-1 rounded-full font-black">現場排隊</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+
+                            <!-- Item: Ganaha Pork dinner -->
+                            <div class="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="bg-[#FF7B89] text-white px-1.5 py-0.5 rounded text-[10px]">晚餐</span>
+                                        <h4 class="font-black text-sm md:text-base">我那覇豚肉店 前島總店 (涮涮鍋)</h4>
+                                    </div>
+                                    <p class="text-xs text-[#4A3E3D]/60 mt-1">✅ 狀態：已預訂成功！18:30 入席 (已保留 2 桌大桌)</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="status-badge-ok text-[11px] px-2.5 py-1 rounded-full font-black">已預訂成功</span>
+                                    <div class="text-right text-[#4A3E3D]/50 font-black">現場結帳自理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Overlay Loader -->
+    <div id="loader" class="fixed inset-0 bg-black/50 z-50 flex flex-col items-center justify-center text-white font-black text-lg">
+        <div class="bg-white text-[#4A3E3D] p-6 rounded-3xl border-4 border-[#4A3E3D] shadow-[4px_4px_0px_#000] flex flex-col items-center gap-4">
+            <span class="animate-spin text-4xl text-[#FF7B89]"><i class="fa-solid fa-spinner"></i></span>
+            <span>正在為您產生日系手繪風費用圖卡...</span>
+            <span class="text-xs font-bold text-gray-500">完成後將會自動為您下載</span>
+        </div>
+    </div>
+
+    <script>
+        // 費用底層資料結構 (以單一家庭為單位計算)
+        // isPrepay: true 代表需先線上付費, false 代表現場買
+        const singleFamilyCostItems = [
+            { name: "部瀨名海中公園 (玻璃船)", jpy: 2100, isPrepay: false },
+            { name: "琉球村 (手作彩繪 DIY)", jpy: 2200, isPrepay: true },
+            { name: "釣熱帶魚冒險之旅", jpy: 4680, isPrepay: false },
+            { name: "DMM 兒童水族館門票", jpy: 1890, isPrepay: false },
+            { name: "TeamLab 門票與體驗費", jpy: 3200, isPrepay: true }
+        ];
+
+        // 計算與更新所有數值 (以單一家庭為單位)
+        function recalculateAll() {
+            const rate = parseFloat(document.getElementById('exchange-rate').value) || 0.215;
+            
+            let totalJpy = 0;
+            let prepayJpy = 0;
+
+            singleFamilyCostItems.forEach(item => {
+                totalJpy += item.jpy;
+                if (item.isPrepay) {
+                    prepayJpy += item.jpy;
+                }
+            });
+
+            const totalTwd = Math.round(totalJpy * rate);
+            const prepayTwd = Math.round(prepayJpy * rate);
+
+            // 渲染數據至頁面
+            document.getElementById('single-family-total-jpy').textContent = totalJpy.toLocaleString();
+            document.getElementById('single-family-total-twd').textContent = totalTwd.toLocaleString();
+
+            document.getElementById('single-family-prepay-jpy').textContent = prepayJpy.toLocaleString();
+            document.getElementById('single-family-prepay-twd').textContent = prepayTwd.toLocaleString();
+        }
+
+        // 下載為 PNG 圖片檔案
+        function downloadAsImage() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex'; // 顯示載入動畫
+
+            const captureElement = document.getElementById('printable-area');
+            
+            // 使用 html2canvas 將 DOM 渲染為 Canvas
+            html2canvas(captureElement, {
+                backgroundColor: '#FFFDF4', // 確保底色一致
+                scale: 2, // 提高圖片解析度
+                useCORS: true, // 允許跨域圖片資源
+                logging: false
+            }).then(canvas => {
+                // 將 Canvas 轉換為 PNG Blob 網址
+                const imageBase64 = canvas.toDataURL('image/png');
+                
+                // 建立一個隱藏的 A 標籤下載檔案
+                const downloadLink = document.createElement('a');
+                downloadLink.href = imageBase64;
+                downloadLink.download = '單一家沖繩預約費用手札.png';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+
+                loader.style.display = 'none'; // 隱藏載入動畫
+            }).catch(err => {
+                console.error('圖片生成失敗: ', err);
+                loader.style.display = 'none';
+                alert('圖片生成失敗，建議使用瀏覽器的列印/另存PDF功能儲存。');
+            });
+        }
+
+        // 初始化
+        window.onload = function() {
+            recalculateAll();
+        }
+    </script>
+</body>
+</html>
